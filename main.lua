@@ -1,7 +1,11 @@
 --main.lua
 
 function love.load()
+    w = love.graphics.getWidth()
+    h = love.graphics.getHeight()
+
     anim8 = require('libraries/anim8')
+    drawStuff = require("src.drawStuff")
     tileSize = 32
     batterySizeX = 80
     batterySizeY = 40
@@ -55,6 +59,7 @@ end
 
 function love.update(dt)
     local isMoving = false
+    
     if not love.keyboard.isDown("w") or not love.keyboard.isDown("a") or not love.keyboard.isDown("s") or not love.keyboard.isDown("d")then
         player.stamina = player.stamina + 1.5 * dt
     end
@@ -124,32 +129,13 @@ function love.keypressed(key)
     end
 end
 
+function love.resize()
+    w = love.graphics.getWidth()
+    h = love.graphics.getHeight()
+end
+
 function love.draw()
     love.graphics.setColor(1,1,1)
-    for rowIndex, row in ipairs(map) do
-        for columnIndex, column in ipairs(row) do
-            if column > 0 then
-                love.graphics.setColor(1,1,1)
-                local sprite = sprites[column]
-
-                local x = columnIndex * tileSize
-                local y = rowIndex * tileSize
-                local imageWidth, imageHeight = sprite:getDimensions()
-                local scaleX =  tileSize / imageWidth
-                local scaleY =  tileSize / imageHeight
-
-                local px = player.x * tileSize
-                local py = player.y * tileSize
-
-                love.graphics.draw(sprite,x,y,nil,scaleX,scaleY)
-
-                player.anim:draw(playerSprite, px,py, nil, tileSize / 12,tileSize / 12)
-            end
-        end
-    end
-    love.graphics.setColor(.2,.2,.2)
-    love.graphics.rectangle("fill", 10,10, batterySizeX,batterySizeY)
-    love.graphics.setColor(0,1,0)
-    love.graphics.rectangle("fill", 16,16, player.stamina * 6, batterySizeY - 11)
-    print(player.stamina)
+    drawStuff.drawMap()
+    drawStuff.drawPlayer()
 end
