@@ -4,7 +4,7 @@ playerSRC = {}
 function playerSRC.draw()
     local px = player.x * tileSize
     local py = player.y * tileSize
-    local ps = tileSize /16
+    local ps = tileSize / 16
 
     player.anim:draw(playerSprite, px,py, nil, ps,ps)-- do tileSize / 16 for size args if you forget
     love.graphics.setColor(.2,.2,.2)

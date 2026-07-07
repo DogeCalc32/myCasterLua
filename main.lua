@@ -5,8 +5,6 @@ function love.load()
     h = love.graphics.getHeight()
 
     anim8 = require('libraries/anim8')
-    drawStuff = require("src.drawStuff")
-    playerUpdate = require("src.playerUpdate")
     playerSRC = {
         draw = require("src.player.draw"),
         update = require("src.player.update"),
