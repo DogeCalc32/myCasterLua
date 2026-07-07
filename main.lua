@@ -6,11 +6,27 @@ function love.load()
 
     anim8 = require('libraries/anim8')
     drawStuff = require("src.drawStuff")
-    updateStuff = require("src.updateStuff")
-    tileSize = 32
+    playerUpdate = require("src.playerUpdate")
+    playerSRC = {
+        draw = require("src.player.draw"),
+        update = require("src.player.update"),
+    }
+    mapSRC = {
+        draw = require("src.map.draw"),
+        update = require("src.map.update")
+    }
+
+    tileSize = (w+h)/62
     batterySizeX = 80
     batterySizeY = 40
-    map = { -- 1 = ground, 2 = wall 
+
+    map = { --[[0 = nothing,
+        1 = ground,
+        2 = wall,
+        3 = piece,
+        4 = shrine,
+        5 = trapdoor,
+        6 = crack ]]
         layer1 = {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -34,16 +50,18 @@ function love.load()
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
         },
+
         layer2 = {
             {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-            {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
-            {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
+            {2,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
+            {2,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,3,4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
+            {2,0,0,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
@@ -52,11 +70,10 @@ function love.load()
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
-            {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
-            {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,2},
+            {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,2},
             {2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2},
             {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-        }
+        },
     }
 
     love.graphics.setDefaultFilter("nearest", "nearest")
@@ -66,7 +83,9 @@ function love.load()
     groundSprite = love.graphics.newImage("assets/ground.png")
     pieceSprite = love.graphics.newImage("assets/piece.png")
     shrineSprite = love.graphics.newImage("assets/shrine.png")
-    sprites = {groundSprite,wallSprite,pieceSprite,shrineSprite}
+    trapdoorSprite = love.graphics.newImage("assets/trapdoor.png")
+    crackSprite = love.graphics.newImage("assets/crack.png")
+    sprites = {groundSprite,wallSprite,pieceSprite,shrineSprite,trapdoorSprite,crackSprite}
 
     player = {
         x = 2,
@@ -84,71 +103,11 @@ function love.load()
 
     player.anim = player.animations.down
 end
-
+--[[ ===================================================
+     UPDATE
+]]
 function love.update(dt)
-    local isMoving = false
-
-    if not love.keyboard.isDown("w") or not love.keyboard.isDown("a") or not love.keyboard.isDown("s") or not love.keyboard.isDown("d")then
-        player.stamina = player.stamina + 1.5 * dt
-    end
-    if love.keyboard.isDown("lshift")  and player.stamina > 0 then -- sprint key
-        player.stamina = player.stamina - 3 * dt
-
-        if love.keyboard.isDown("w") then
-            player.y = player.y - player.sprint * dt
-            player.anim = player.animations.up
-            isMoving = true
-        end
-
-        if love.keyboard.isDown("a") then
-            player.x = player.x - player.sprint * dt
-            player.anim = player.animations.left
-            isMoving = true
-        end
-
-        if love.keyboard.isDown("s") then
-            player.y = player.y + player.sprint * dt
-            player.anim = player.animations.down
-            isMoving = true
-        end
-
-        if love.keyboard.isDown("d") then
-            player.x = player.x + player.sprint * dt
-            player.anim = player.animations.right
-            isMoving = true
-        end
-    else -- normal walk
-        if love.keyboard.isDown("w") then
-            player.y = player.y - player.speed * dt
-            player.anim = player.animations.up
-            isMoving = true
-        end
-
-        if love.keyboard.isDown("a") then
-            player.x = player.x - player.speed * dt
-            player.anim = player.animations.left
-            isMoving = true
-        end
-
-        if love.keyboard.isDown("s") then
-            player.y = player.y + player.speed * dt
-            player.anim = player.animations.down
-            isMoving = true
-        end
-
-        if love.keyboard.isDown("d") then
-            player.x = player.x + player.speed * dt
-            player.anim = player.animations.right
-            isMoving = true
-        end
-    end
-    if player.stamina > 10 then
-        player.stamina = 10
-    end
-    if isMoving == false then
-        player.anim:gotoFrame(1)
-    end
-    player.anim:update(dt)
+    playerSRC.update(dt)
 end
 
 function love.keypressed(key)
@@ -160,10 +119,14 @@ end
 function love.resize()
     w = love.graphics.getWidth()
     h = love.graphics.getHeight()
+    tileSize = (w + h)/62
 end
-
+--[[ ===================================================
+     DRAW
+]]
 function love.draw()
+    -- love.graphics.scale(1.05,1.05)
     love.graphics.setColor(1,1,1)
-    drawStuff.drawMap()
-    drawStuff.drawPlayer()
+    mapSRC.draw()
+    playerSRC.draw()
 end
