@@ -75,14 +75,13 @@ function love.load()
     }
 
     love.graphics.setDefaultFilter("nearest", "nearest")
-
-    playerSprite = love.graphics.newImage("assets/player.png")
-    wallSprite = love.graphics.newImage("assets/wall.png")
-    groundSprite = love.graphics.newImage("assets/ground.png")
-    pieceSprite = love.graphics.newImage("assets/piece.png")
-    shrineSprite = love.graphics.newImage("assets/shrine.png")
-    trapdoorSprite = love.graphics.newImage("assets/trapdoor.png")
-    crackSprite = love.graphics.newImage("assets/crack.png")
+    playerSprite = love.graphics.newImage("assets/player/player.png")
+    wallSprite = love.graphics.newImage("assets/terrain/wall.png")
+    groundSprite = love.graphics.newImage("assets/terrain/ground.png")
+    pieceSprite = love.graphics.newImage("assets/decoration/piece.png")
+    shrineSprite = love.graphics.newImage("assets/decoration/shrine.png")
+    trapdoorSprite = love.graphics.newImage("assets/terrain/trapdoor.png")
+    crackSprite = love.graphics.newImage("assets/decoration/crack.png")
     sprites = {groundSprite,wallSprite,pieceSprite,shrineSprite,trapdoorSprite,crackSprite}
 
     player = {
@@ -90,7 +89,7 @@ function love.load()
         y = 2,
         speed = 2.8,
         sprint = 5,
-        stamina = 10,
+        stamina = 11,
         grid = anim8.newGrid( 16,16, 64,64),
         animations = {},
     }
@@ -123,7 +122,6 @@ end
      DRAW
 ]]
 function love.draw()
-    -- love.graphics.scale(1.05,1.05)
     love.graphics.setColor(1,1,1)
     mapSRC.draw()
     playerSRC.draw()
